@@ -9,10 +9,10 @@ from xml_parser import mortaraXMLPARSER, GEXMLparser
 import scipy.io
 
 
-class ECGLabApp:
+class ECGlyticsApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("ECG LAB")
+        self.root.title("ECGlytics - ECG Analytics")
         self.root.geometry("1500x1000")
 
         # Variables to store data
@@ -1539,7 +1539,7 @@ class ECGLabApp:
     
 def main():
     root = tk.Tk()
-    app = ECGLabApp(root)
+    app = ECGlyticsApp(root)
     root.mainloop()
 
 

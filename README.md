@@ -53,8 +53,8 @@ pip install -r requirements.txt
 ### Setup
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/ecg-lab.git
-cd ecg-lab
+git clone https://github.com/BME-Jafar/ECGlytics
+cd ECGlytics
 ```
 
 2. Ensure all required files are present:

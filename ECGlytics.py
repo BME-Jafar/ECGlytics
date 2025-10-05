@@ -286,7 +286,6 @@ class ECGlyticsApp:
         self.points_listbox.bind('<<ListboxSelect>>', self.on_point_select)
         
     def crop_signal(self):
-        """Crop the signal to the current view window"""
 
         if self.signal_data is None:
              messagebox.showwarning("Warning", "Start by loading a signal!")
@@ -296,6 +295,7 @@ class ECGlyticsApp:
              return
         data = self.segmentation_data
         signal = self.signal_data[self.current_index]
+        signal = np.array(signal)
 
         try:
             startPoints = data[self.current_index]['ecg_start']
@@ -313,7 +313,6 @@ class ECGlyticsApp:
         )
 
         if endPoints is None:
-            
             for point,i in zip(startPoints, range(len(startPoints))):
                 croppedSignal = signal[:,point:]
                 signalDic = {"ECG": croppedSignal, "fs": self.sample_rate}
@@ -1302,7 +1301,7 @@ class ECGlyticsApp:
     def load_signal(self):
         # Open file dialog to select a signal file
         filetypes = [
-            ('All supported files', '*.xml *.mat *.npy *.txt *.csv *.ecg')  # combined
+            ('All supported files', '*.xml *.mat *.npy *.txt *.csv *.ecg *.bin')  # combined
         ]
 
         filename = filedialog.askopenfilename(
@@ -1359,6 +1358,28 @@ class ECGlyticsApp:
                                 messagebox.showwarning(
                                     "Warning", "Failed to read sampling rate from ECG file, using default 200 Hz.")
                                 fs = 200  # Default value if not found
+                elif ext == '.bin':
+                    data, extra = self.load_mfbf(filename)
+                    data = np.array(data)
+                    # Try to extract sampling rate from extra text
+                    fs = None
+                    for line in extra:
+                        if 'sampling' in line.lower() and '=' in line:
+                            try:
+                                fs = float(line.split('=')[1].strip())
+                                break
+                            except:
+                                continue
+                    if fs is None:
+                        messagebox.showwarning(
+                                    "Warning", "Failed to read sampling rate from ECG file, using default 200 Hz.")
+                        fs = 1000  # Default value if not found
+                    else:
+                        self.sample_rate = fs
+                        self.sample_rate_var = tk.StringVar(
+                            value=str(fs))
+                        ttk.Entry(self.lead_filter_frame, textvariable=self.sample_rate_var, width=5).grid(
+                            row=0, column=4, padx=5, pady=5)                
                 elif ext == ".xml": #GE MUSE
                     data, fs = self.load_xml(filename)
                     if fs is None:
